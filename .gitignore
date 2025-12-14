@@ -97,3 +97,36 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+
+# --- กรองไฟล์หนักทิ้ง เอาแค่โค้ด ---
+# Block 3D Models
+*.fbx
+*.obj
+*.blend
+*.max
+*.ma
+*.mb
+
+# Block Images/Textures (ถ้าอยากเห็นรูป ui เล็กๆ ให้ลบพวก jpg/png ออก)
+*.psd
+*.tga
+*.tif
+*.tiff
+*.jpg
+*.jpeg
+*.png
+*.bmp
+
+# Block Audio/Video
+*.wav
+*.mp3
+*.ogg
+*.mp4
+*.mov
+*.avi
+*.aif
+
+# Block Builds
+*.apk
+*.aab
+*.exe
