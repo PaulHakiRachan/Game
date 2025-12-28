@@ -28,19 +28,23 @@ public class PlayerCombatManager : MonoBehaviour
     [SerializeField] public bool readyToPerformAttack = true;
     [SerializeField] float waitingTime = 2;
 
+    [SerializeField] public bool doAnotherAttack = false;
+
 
     protected virtual void Awake()
     {
         player = GetComponent<Player>();
     }
 
+
     public void PerformWeaponBasedAction(WeaponItemAction weaponAction, WeaponItem weaponPerformingAction)
     {
         currentWeaponBeingUsed = weaponPerformingAction;
-        
-        weaponAction.AttemptToPerformAction(Player.instance, weaponPerformingAction);   
 
-        Player.instance.PlayerWeaponAction(weaponAction.actionID, weaponPerformingAction.itemID);
+        if (weaponAction != null)
+        {
+            weaponAction.AttemptToPerformAction(player, weaponPerformingAction);
+        }
     }
 
     public void DrainStaminaBasedOnAttack()

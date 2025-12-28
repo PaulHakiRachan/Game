@@ -2,27 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : CharacterManager
 {
     public static Player instance;
     [HideInInspector] public CharacterController characterController;
     [HideInInspector] public Animator animator;
-
-    [HideInInspector] public PlayerAnimatorManger playerAnimatorManager;
-    [HideInInspector] public PlayerMovement playerMovement;
-    [HideInInspector] public PlayerDodge playerDodge;
-    [HideInInspector] public PlayerInput playerInput;
-    [HideInInspector] public PlayerStatManager playerStatManager;
-    [HideInInspector] public PlayerCurrentState playerCurrentState;
-    [HideInInspector] public PlayerEffectsManager playerEffectManager;
-    [HideInInspector] public PlayerUIPopUpManager playerUIPopUpManager;
-    [HideInInspector] public PlayerInventoryManager playerInventoryManager;
-    [HideInInspector] public PlayerEquipmentManager playerEquipmentManager;
-    [HideInInspector] public PlayerCombatManager playerCombatManager;
-    [HideInInspector] public PlayerSFXManager playerSFXManager;
-
-    [Header("Character Group")]
-    public CharacterGroup characterGroup;
 
     public int currentRightHandWeaponID;
     public int currentLeftHandWeaponID;
@@ -93,7 +77,7 @@ public class Player : MonoBehaviour
     public event System.Action<bool, bool> OnChargingAttack;
 
 
-    protected virtual void Awake()
+    protected override void Awake()
     {
         instance = this;
 
@@ -107,10 +91,11 @@ public class Player : MonoBehaviour
         playerStatManager = GetComponent<PlayerStatManager>();
         playerCurrentState = GetComponent<PlayerCurrentState>();
         playerEffectManager = GetComponent<PlayerEffectsManager>();
+        playerUIPopUpManager = GetComponent<PlayerUIPopUpManager>();
         playerInventoryManager = GetComponent<PlayerInventoryManager>();
         playerEquipmentManager = GetComponent<PlayerEquipmentManager>();
         playerCombatManager = GetComponent<PlayerCombatManager>();
-        playerSFXManager = GetComponent<PlayerSFXManager>();
+        characterSFXManager = GetComponent<CharacterSFXManager>();
 
         OnRightHandWeaponIDChanged += OnCurrentRightHandWeaponIDChange;
         OnLeftHandWeaponIDChanged += OnCurrentLeftHandWeaponIDChange;
@@ -134,11 +119,6 @@ public class Player : MonoBehaviour
         playerStatManager.RegenerateStamina();
     }
 
-    protected virtual void FixedUpdate()
-    {
-        
-    }
-
     public void SaveGameToCurrentCharacterData(ref PlayerSaveData currentCharacterData)
     {
         currentCharacterData.xPosition = transform.position.x;
@@ -160,13 +140,13 @@ public class Player : MonoBehaviour
         playerStatManager.vitality = currentCharacterData.vitality;
         playerStatManager.endurance = currentCharacterData.endurance;
 
-        playerStatManager.currentHealth = currentCharacterData.currentHealth;
+        playerStatManager.CurrentHealth = currentCharacterData.currentHealth;
         playerStatManager.currentStamina = currentCharacterData.currentStamina;
     }
 
     public IEnumerator ProcessDeathEvent(bool manuallySelectDeathAnimation = false)
     {
-        playerStatManager.currentHealth = 0f;
+        playerStatManager.CurrentHealth = 0f;
         playerCurrentState.isDead = true;
 
         if (!manuallySelectDeathAnimation)
@@ -182,18 +162,30 @@ public class Player : MonoBehaviour
     {
         WeaponItem newWeapon = Instantiate(WorldItemDatabase.instance.GetWeaponByID(newID));
         playerInventoryManager.currentRightHandWeapon = newWeapon;
-        playerEquipmentManager.LoadRightWeapon();
+        StartCoroutine(WaitAndLoadRightWeapon());
 
         PlayerUIManager.instance.playerUIHUDManager.SetRightWeaponQuickSlotIcon(newID);
+    }
+    private IEnumerator WaitAndLoadRightWeapon()
+    {
+        yield return new WaitForSeconds(playerInput.switchingWeaponTime);
+
+        playerEquipmentManager.LoadRightWeapon();
     }
 
     public void OnCurrentLeftHandWeaponIDChange(int oldID, int newID)
     {
         WeaponItem newWeapon = Instantiate(WorldItemDatabase.instance.GetWeaponByID(newID));
         playerInventoryManager.currentLeftHandWeapon = newWeapon;
-        playerEquipmentManager.LoadLeftWeapon();
+        StartCoroutine(WaitAndLoadLeftWeapon());
 
         PlayerUIManager.instance.playerUIHUDManager.SetLeftWeaponQuickSlotIcon(newID);
+    }
+    private IEnumerator WaitAndLoadLeftWeapon()
+    {
+        yield return new WaitForSeconds(playerInput.switchingWeaponTime);
+
+        playerEquipmentManager.LoadLeftWeapon();
     }
 
     public void OnChargingAttackBoolChange(bool oldBool, bool newBool)
@@ -244,19 +236,20 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void PlayerWeaponAction(int actionID, int weaponID)
+    /*public void PlayerWeaponAction(int actionID, int weaponID)
     {
         WeaponItemAction weaponActionItem = WorldActionManager.instance.GetWeaponActionItemByID(actionID);
 
         if(weaponActionItem != null)
         {
-            weaponActionItem.AttemptToPerformAction(Player.instance, WorldItemDatabase.instance.GetWeaponByID(weaponID));
+            weaponActionItem.AttemptToPerformAction(this, WorldItemDatabase.instance.GetWeaponByID(weaponID));
         }
         else
         {
             Debug.Log("ACTION IS NULL");
         }
-    }
+    }*/
+
 
     
 

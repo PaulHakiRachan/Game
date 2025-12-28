@@ -40,13 +40,16 @@ public class TakeDamageEffect : InstantPlayerEffect
     {
         base.ProcessEffect(character);
 
-        if (character.characterCurrentStat.isDead)
+        if (character.characterCurrentState.isDead)
         {
             return;
         }
 
         CalculateDamage(character);
-        //PlayDirectionalBasedDamageAnimation(character);
+        if (character.player != null)
+        {
+            PlayDirectionalBasedDamageAnimation(character);
+        }
         PlayDamageSFX(character);
         PlayDamageVFX(character);
 
@@ -66,7 +69,7 @@ public class TakeDamageEffect : InstantPlayerEffect
             finalDamageDealt = 1;
         }
 
-        character.characterStatManager.currentHealth -= finalDamageDealt;
+        character.characterStatManager.CurrentHealth -= finalDamageDealt;
 
 
     }
@@ -80,19 +83,16 @@ public class TakeDamageEffect : InstantPlayerEffect
     {
         AudioClip physicalDamageSFX = WorldSFXManager.instance.ChooseRandomSFXFromArray(WorldSFXManager.instance.physicalDamageSFX);
 
-        character.playerSFXManager.PlaySFX(physicalDamageSFX);
+        character.characterSFXManager.PlaySFX(physicalDamageSFX);
     }
 
     private void PlayDirectionalBasedDamageAnimation(CharacterManager character)
     {
-        if (character.player.playerCurrentState.isDead)
+        if (character.characterCurrentState.isDead)
         {
             return;
         }
-        if (character.aICharacterManager.aICurrentState.isDead)
-        {
-            return;
-        }
+        
 
         poiseIsBroken = true;
 

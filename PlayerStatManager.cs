@@ -113,7 +113,7 @@ public class PlayerStatManager : CharacterStatManager
 
         if (currentHealth > baseHealth * vitality)
         {
-            currentHealth = baseHealth * vitality;
+            CurrentHealth = baseHealth * vitality;
         }
     }
 }

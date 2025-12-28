@@ -1,11 +1,11 @@
+using System.Collections;
 using UnityEditor.Rendering.LookDev;
 using UnityEngine;
 using UnityEngine.AI;
 
 public class AICharacterManager : CharacterManager
 {
-    public static AICharacterManager instance;
-    
+   
     [HideInInspector] public AICharacterCombatManager aICharacterCombatManager;
     [HideInInspector] public AIMovementManager aIMovementManager;
     [HideInInspector] public AIAnimationManager aIAnimationManager;
@@ -22,6 +22,7 @@ public class AICharacterManager : CharacterManager
     public PurSueTargetState purSueTarget;
     public AICombatStanceState combatStance;
     public AIAttackState attack;
+    public AIDeathState deathState;
     
 
     [HideInInspector] public Animator animator;
@@ -48,15 +49,6 @@ public class AICharacterManager : CharacterManager
     protected override void Awake()
     {
         base.Awake();
-        
-        if(instance == null)
-        {
-            instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
         aICharacterCombatManager = GetComponent<AICharacterCombatManager>();
         aIMovementManager = GetComponent<AIMovementManager>();
         aICurrentState = GetComponent<AICurrentState>();
@@ -82,7 +74,15 @@ public class AICharacterManager : CharacterManager
         OnMoving += OnMovingBoolChange;
     }
 
-    private void Update()
+    private void Start()
+    {
+        characterSFXManager.audioSource.loop = true;
+        characterSFXManager.audioSource.clip = WorldSFXManager.instance.UndeadIdleSFX;
+        characterSFXManager.audioSource.volume = 1f;
+        characterSFXManager.audioSource.Play();
+    }
+
+    protected virtual void Update()
     {
         aICharacterCombatManager.HandleActionRecovery(this);
     }
@@ -146,5 +146,47 @@ public class AICharacterManager : CharacterManager
     private void OnDisable()
     {
         OnMoving -= OnMovingBoolChange;
+    }
+
+    public IEnumerator ProcessingDeath()
+    {
+        deathState.SwitchToDeathState(this);
+        aIAnimationManager.enabled = false;
+        animator.Rebind(); // ล้างค่า Parameter 
+        animator.Update(0); // refresh animation
+        aICharacterManager.aICurrentState.isDead = true;
+        int randomDeathAnimation = Random.Range(0,2);
+
+        characterSFXManager.StopAllAISounds();
+        
+
+
+        if(navMeshAgent != null)
+        {
+            navMeshAgent.enabled = false;
+        }
+
+        if(GetComponentInChildren<Collider>() != null)
+        {
+            GetComponentInChildren<Collider>().enabled = false;
+        }
+
+        aICurrentState.isPerformingAction = true;
+        
+
+        yield return null;
+
+        if(randomDeathAnimation == 0)
+        {
+            aIAnimationManager.PlayerTargetActionAnimation("Undead_Dying_01", true, false);
+        }
+        else
+        {
+            aIAnimationManager.PlayerTargetActionAnimation("Undead_Dying_02", true, false);
+        }
+
+        yield return new WaitForSeconds(5);
+
+        Destroy(gameObject);
     }
 }

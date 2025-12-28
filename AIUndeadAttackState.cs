@@ -1,26 +1,13 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "A.I/States/Attack")]
+[CreateAssetMenu(menuName = "A.I/States/UndeadAttack")]
 
-public class AIAttackState : AIState
+public class AIUndeadAttackState : AIAttackState
 {
-    [Header("Current Attack")]
-    [HideInInspector] public AIAttackAction currentAttack;
-    [HideInInspector] public bool willPerformCombo = false;
-
-    [Header("Other Current Attack")]
-    [HideInInspector] public AIUndeadAttackAction currentUndeadAttack;
-
-    [Header("Flags")]
-    protected bool hasPerformAttack = false;
-    protected bool hasPerformCombo = false;
-
-    [Header("Pivot After Attack")]
-    [SerializeField] protected bool pivotAfterAttack = false;
 
     public override AIState Tick(AICharacterManager aICharacter)
     {
-        if(aICharacter.aICharacterCombatManager.currentTarget == null) //ไม่เจอผู้เล่น กลับไปState idle
+        if (aICharacter.aICharacterCombatManager.currentTarget == null) //ไม่เจอผู้เล่น กลับไปState idle
         {
             return SwitchState(aICharacter, aICharacter.idle);
         }
@@ -32,12 +19,12 @@ public class AIAttackState : AIState
 
         aICharacter.aICharacterCombatManager.RotateTowardsTargetWhileAttacking(aICharacter); //หันตามผู้เล่นขณะโจมตี
 
-        if(willPerformCombo && !hasPerformAttack) // เอาไว้คอมโบ **ตอนนี้ยังไม่มี**
+        if (willPerformCombo && !hasPerformAttack) // เอาไว้คอมโบ **ตอนนี้ยังไม่มี**
         {
-            if(currentAttack.comboAction != null)
+            if (currentUndeadAttack.comboAction != null)
             {
                 hasPerformCombo = true;
-                currentAttack.comboAction.AttemptToPerformAction(aICharacter);
+                currentUndeadAttack.comboAction.AttemptToPerformAction(aICharacter);
             }
         }
 
@@ -48,8 +35,9 @@ public class AIAttackState : AIState
 
         if (!hasPerformAttack) //ยังไม่ได้โจมตี
         {
-            if(aICharacter.aICharacterCombatManager.actionRecoveryTimer > 0) // ถ้าคูลดาวหลังโจมตียังไม่เหลือ 0 ให้วนmedthod
+            if (aICharacter.aICharacterCombatManager.actionRecoveryTimer > 0) // ถ้าคูลดาวหลังโจมตียังไม่เหลือ 0 ให้วนmedthod
             {
+                //Debug.Log("ยังคูลดาวอยู่");
                 return this;
             }
 
@@ -67,20 +55,19 @@ public class AIAttackState : AIState
         {
             aICharacter.aICharacterCombatManager.PivotTowardTarget(aICharacter);
         }
-
+        Debug.Log("AttackState ทำงานเสร็จแล้ว");
         return SwitchState(aICharacter, aICharacter.combatStance);
-
     }
 
-    protected virtual void PerformAttack(AICharacterManager aICharacter) //medthod สั่งโจมตี
+    protected override void PerformAttack(AICharacterManager aICharacter)
     {
         hasPerformAttack = true;
-        currentAttack.AttemptToPerformAction(aICharacter); //เล่นanimation
+        currentUndeadAttack.AttemptToPerformAction(aICharacter); //เล่นanimation ของUndead
 
-        aICharacter.aICharacterCombatManager.actionRecoveryTimer = currentAttack.actionRecoveryTime; //ตั้งคูลดาวตามท่าที่ใช้โจมตี
+        aICharacter.aICharacterCombatManager.actionRecoveryTimer = currentUndeadAttack.actionRecoveryTime; //ตั้งคูลดาวตามท่าที่ใช้โจมตี ของUndead
     }
 
-    protected override void ResetStateFlags(AICharacterManager aICharacter) 
+    protected override void ResetStateFlags(AICharacterManager aICharacter)
     {
         base.ResetStateFlags(aICharacter);
 

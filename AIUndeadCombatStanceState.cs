@@ -2,32 +2,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-[CreateAssetMenu(menuName = "A.I/States/Combat Stance")]
+[CreateAssetMenu(menuName = "A.I/States/Undead Combat Stance")]
 
-public class AICombatStanceState : AIState
+public class AIUndeadCombatStanceState : AICombatStanceState
 {
-    [Header("Attacks")]
-    public List<AIAttackAction> aIAttack;
-    protected List<AIAttackAction> potentialAttacks;
-    protected AIAttackAction chooseAttack;
-    protected AIAttackAction previosAttack;
-    protected bool hasAttack = false;
-
-    [Header("Combo")]
-    [SerializeField] protected bool canPerformCombo = false;
-    [SerializeField] protected int chanceToPerformCombo = 25;
-    protected bool hasRollForComboChance = false;
-
-    [Header("Engagement Distance")]
-    [SerializeField] public  float maximumEngagementDistance = 5;
+    public List<AIUndeadAttackAction> aIUndeadAttack;
+    protected List<AIUndeadAttackAction> potentialUndeadAttacks;
+    protected AIUndeadAttackAction chooseUndeadAttack;
+    protected AIUndeadAttackAction previosUndeadAttack;
 
     public override AIState Tick(AICharacterManager aICharacter)
     {
+        Debug.Log("Combat stance ของ undead กำลังทำงาน");
         if (aICharacter.aICurrentState.isPerformingAction) //ถ้าAIเล่นอนิเมชั่นอยู่ให้รัน state นี้ใหม่
         {
             return this;
         }
-        
+
         if (!aICharacter.navMeshAgent.enabled) //ถ้าnavmeshปิดอยู่ให้เปิด
         {
             aICharacter.navMeshAgent.enabled = true;
@@ -35,12 +26,12 @@ public class AICombatStanceState : AIState
 
         if (!aICharacter.IsMoving) //ไม่ขยับอยู่แหละเป้าหมายอยู่นอกสายตา ให้ขยับตาม
         {
-            if(aICharacter.aICharacterCombatManager.viewableAngle < -30 || aICharacter.aICharacterCombatManager.viewableAngle > 30)
+            if (aICharacter.aICharacterCombatManager.viewableAngle < -30 || aICharacter.aICharacterCombatManager.viewableAngle > 30)
             {
                 aICharacter.aICharacterCombatManager.PivotTowardTarget(aICharacter); //หันแบบเล่นอนิเมชั่น
             }
 
-            
+
         }
 
         aICharacter.aICharacterCombatManager.RotateTowardsAgent(aICharacter); //หันตามผู้เล่น
@@ -56,12 +47,13 @@ public class AICombatStanceState : AIState
         }
         else //มีท่าโจมตีแล้ว ส่งท่าโจมตีไปให้ stateAttack และเปลี่ยนstate
         {
-            aICharacter.attack.currentAttack = chooseAttack;
+            aICharacter.attack.currentUndeadAttack = chooseUndeadAttack;
+            Debug.Log("สั่งโจมตี");
 
             return SwitchState(aICharacter, aICharacter.attack);
         }
 
-        if(aICharacter.aICharacterCombatManager.distanceFromTarget > maximumEngagementDistance)  //ถ้าผู้เล่นอยู่ไกลเกินให้เปลี่ยนStateเป็นเดินเข้าหาผู้เล่น
+        if (aICharacter.aICharacterCombatManager.distanceFromTarget > maximumEngagementDistance)  //ถ้าผู้เล่นอยู่ไกลเกินให้เปลี่ยนStateเป็นเดินเข้าหาผู้เล่น
         {
             return SwitchState(aICharacter, aICharacter.purSueTarget);
         }
@@ -74,13 +66,14 @@ public class AICombatStanceState : AIState
         return this; //วน
     }
 
-    protected virtual void GetNewAttack(AICharacterManager aICharacter)
+    protected override void GetNewAttack(AICharacterManager aICharacter)
     {
-        potentialAttacks = new List<AIAttackAction>();
+        potentialUndeadAttacks = new List<AIUndeadAttackAction>();
+        Debug.Log($"กำลังหาท่าโจมตี... มีท่าในลิสต์ทั้งหมด {aIUndeadAttack.Count} ท่า");
 
-        foreach (var potentialAttack in aIAttack)
+        foreach (var potentialAttack in aIUndeadAttack) // ลูปหาท่าใน Undead
         {
-            if(potentialAttack.minimumDistance > aICharacter.aICharacterCombatManager.distanceFromTarget) //ใกล้ไป
+            if (potentialAttack.minimumDistance > aICharacter.aICharacterCombatManager.distanceFromTarget) //ใกล้ไป
             {
                 continue;
             }
@@ -88,7 +81,7 @@ public class AICombatStanceState : AIState
             {
                 continue;
             }
-            if(potentialAttack.minimumAttackAngle > aICharacter.aICharacterCombatManager.viewableAngle) //ซ้ายเกิน
+            if (potentialAttack.minimumAttackAngle > aICharacter.aICharacterCombatManager.viewableAngle) //ซ้ายเกิน
             {
                 continue;
             }
@@ -97,17 +90,19 @@ public class AICombatStanceState : AIState
                 continue;
             }
 
-            potentialAttacks.Add(potentialAttack); //เพิ่มท่าที่สามารถโจมตีได้เข้าไปในlist
+            potentialUndeadAttacks.Add(potentialAttack); //เพิ่มท่าที่สามารถโจมตีได้เข้าไปในlist
+            Debug.Log($"มีท่าโจมตีในลิสต์ตอนนี้ทั้งหมด {potentialUndeadAttacks.Count} ท่า");
         }
-
-        if(potentialAttacks.Count <= 0) //ไม่มีท่าเลยให้ คืนค่าออก
+        
+        if (potentialUndeadAttacks.Count <= 0) //ไม่มีท่าเลยให้ คืนค่าออก
         {
+            Debug.Log("ไม่เจอท่าของ Undead");
             return;
-        } 
+        }
 
         var totalWeight = 0; //สร้างน้ำหนักรวมเพื่มมาเก็บค่าน้ำในแต่ละท่าโจมตี
 
-        foreach (var attack in potentialAttacks)//เก็บค่าน้ำหนักรวมจากทุกท่า
+        foreach (var attack in potentialUndeadAttacks)//เก็บค่าน้ำหนักรวมจากทุกท่า
         {
             totalWeight += attack.AttackWeight;
         }
@@ -115,34 +110,22 @@ public class AICombatStanceState : AIState
         var randomWeightValue = Random.Range(1, totalWeight + 1); //สุ่มค่าน้ำหนัก
         var processWeight = 0; //ค่าที่จะเอาค่าน้ำหนักแต่ละค่าไปหาท่าโจมตี
 
-        foreach (var attack in potentialAttacks)
+        foreach (var attack in potentialUndeadAttacks)
         {
             processWeight += attack.AttackWeight; //รับค่าน้ำหนักจากท่านี้มา
 
-            if(randomWeightValue <= processWeight) //ท่าสุ่มน้ำหนัก น้อยกว่าเท่ากับ น้ำหนักที่เอาเอามาหา ก็จะเลือกท่านั้นเป็นท่าโตมตี
+            if (randomWeightValue <= processWeight) //ท่าสุ่มน้ำหนัก น้อยกว่าเท่ากับ น้ำหนักที่เอาเอามาหา ก็จะเลือกท่านั้นเป็นท่าโตมตี
             {
-                chooseAttack = attack;
-                previosAttack = chooseAttack;
+                chooseUndeadAttack = attack;
+                previosUndeadAttack = chooseUndeadAttack;
                 hasAttack = true;
+                Debug.Log($"เลือกท่า {attack} ท่า");
                 return;
             }
         }
     }
-
-    protected virtual bool RollForOutComeChance(int chance)
-    {
-        bool outcomeWillBePerform = false;
-
-        int randomPercentage = Random.Range(0, 100);
-
-        if(randomPercentage < chance)
-        {
-            outcomeWillBePerform = true;
-        }
-
-        return outcomeWillBePerform;
-    }
-
+    
+    
     protected override void ResetStateFlags(AICharacterManager aICharacter)
     {
         base.ResetStateFlags(aICharacter);
@@ -151,3 +134,4 @@ public class AICombatStanceState : AIState
         hasRollForComboChance = false;
     }
 }
+    

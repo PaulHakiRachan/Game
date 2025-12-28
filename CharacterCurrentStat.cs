@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class CharacterCurrentStat : MonoBehaviour
+public class CharacterCurrentState : MonoBehaviour
 {
     [Header("Flags")]
     public bool isPerformingAction = false;

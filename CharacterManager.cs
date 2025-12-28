@@ -2,7 +2,8 @@ using UnityEngine;
 
 public class CharacterManager : MonoBehaviour
 {
-    [HideInInspector] public PlayerAnimatorManger playerAnimatorManger;
+    //public static CharacterManager instance;
+    [HideInInspector] public PlayerAnimatorManger playerAnimatorManager;
     [HideInInspector] public PlayerMovement playerMovement;
     [HideInInspector] public PlayerDodge playerDodge;
     [HideInInspector] public PlayerInput playerInput;
@@ -13,20 +14,21 @@ public class CharacterManager : MonoBehaviour
     [HideInInspector] public PlayerInventoryManager playerInventoryManager;
     [HideInInspector] public PlayerEquipmentManager playerEquipmentManager;
     [HideInInspector] public PlayerCombatManager playerCombatManager;
-    [HideInInspector] public PlayerSFXManager playerSFXManager;
 
     [HideInInspector] public AICharacterManager aICharacterManager;
     [HideInInspector] public Player player;
 
-    [HideInInspector] public CharacterCurrentStat characterCurrentStat;
+    [HideInInspector] public CharacterCurrentState characterCurrentState;
     [HideInInspector] public CharacterStatManager characterStatManager;
+    [HideInInspector] public CharacterSFXManager characterSFXManager;
 
     [Header("Character Group")]
     public CharacterGroup characterGroup;
     
     protected virtual void Awake()
     {
-        playerAnimatorManger = GetComponent<PlayerAnimatorManger>();
+        
+        playerAnimatorManager = GetComponent<PlayerAnimatorManger>();
         playerMovement = GetComponent<PlayerMovement>();
         playerDodge = GetComponent<PlayerDodge>();
         playerInput = GetComponent<PlayerInput>();
@@ -36,15 +38,14 @@ public class CharacterManager : MonoBehaviour
         playerInventoryManager = GetComponent<PlayerInventoryManager>();
         playerEquipmentManager = GetComponent<PlayerEquipmentManager>();
         playerCombatManager = GetComponent<PlayerCombatManager>();
-        playerSFXManager = GetComponent<PlayerSFXManager>();
 
         aICharacterManager = GetComponent<AICharacterManager>();
         player = GetComponent<Player>();
 
-
-        characterCurrentStat = GetComponent<CharacterCurrentStat>();
+        characterCurrentState = GetComponent<CharacterCurrentState>();
         characterStatManager = GetComponent<CharacterStatManager>();
-        
+        characterSFXManager = GetComponent<CharacterSFXManager>();
+
     }
 
     protected virtual void FixedUpdate()

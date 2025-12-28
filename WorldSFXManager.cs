@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class WorldSFXManager : MonoBehaviour
@@ -9,6 +10,15 @@ public class WorldSFXManager : MonoBehaviour
     
     [Header("Action Sounds")]
     public AudioClip rollSFX;
+
+    [Header("Undead Attack Alert")]
+    public AudioClip[] UndeadAttackAlertSFX;
+
+    [Header("Undead Idle")]
+    public AudioClip UndeadIdleSFX;
+
+    [Header("Undead Attack")]
+    public AudioClip[] UndeadAttackSFX;
 
     private void Awake()
     {

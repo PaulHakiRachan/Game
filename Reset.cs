@@ -31,7 +31,7 @@ public class Reset : MonoBehaviour
             player.playerCurrentState.isDead = false;
             player.playerCurrentState.isJumping = false;
 
-            player.playerStatManager.currentHealth = player.playerStatManager.baseHealth * player.playerStatManager.endurance;
+            player.playerStatManager.CurrentHealth = player.playerStatManager.baseHealth * player.playerStatManager.endurance;
         }
 
         if (switchRightWeapon)

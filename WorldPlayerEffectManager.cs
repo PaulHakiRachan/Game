@@ -11,6 +11,7 @@ public class WorldPlayerEffectManager : MonoBehaviour
     [Header("Damage")]
     public TakeDamageEffect takeDamageEffect;
     
+    
 
     [SerializeField] List<InstantPlayerEffect> instantEffects;
     

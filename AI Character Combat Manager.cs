@@ -101,7 +101,7 @@ public class AICharacterCombatManager : PlayerCombatManager
         {
             aICharacter.aIAnimationManager.PlayerTargetActionAnimation("90Turn_Right", true);
         }
-        else if (viewableAngle <= -61 && viewableAngle >= 110)
+        else if (viewableAngle <= -61 && viewableAngle >= -110)
         {
             aICharacter.aIAnimationManager.PlayerTargetActionAnimation("90Turn_Left", true);
         }

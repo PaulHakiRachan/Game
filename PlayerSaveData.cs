@@ -5,8 +5,10 @@ using UnityEngine;
 
 public class PlayerSaveData
 {
+    [Header("Player Name")]
     public string playerName ;
 
+    [Header("Time Played")]
     public float secondsPlayed;
 
     [Header("World Coordinates")]
@@ -21,4 +23,14 @@ public class PlayerSaveData
     [Header("Stats")]
     public float vitality;
     public float endurance;
+
+    [Header("Bosses")]
+    public SerializableDictionnary<int, bool> bossesAwake;
+    public SerializableDictionnary<int, bool> bossesDefeat;
+
+    public PlayerSaveData()
+    {
+        bossesAwake = new SerializableDictionnary<int, bool>();
+        bossesDefeat = new SerializableDictionnary<int, bool>();
+    }
 }

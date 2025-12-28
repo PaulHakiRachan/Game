@@ -25,8 +25,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float sprintingStaminaCost = 20f;
     [SerializeField] public float jumpStaminaCost = 2f;
     
-    private float speed;
+    [SerializeField] float speed;
     [HideInInspector] public bool isRunning;
+    public float runningTime;
     
     private Vector3 targetRotationDirection;
 
@@ -42,7 +43,7 @@ public class PlayerMovement : MonoBehaviour
     private bool wasGroundedLastFrame = false;
 
     
-    private float inAirTimer = 0;       
+    [SerializeField] float inAirTimer = 0;       
 
     private void Awake()
     {
@@ -72,20 +73,38 @@ public class PlayerMovement : MonoBehaviour
     {
         if (isRunning)
         {
-            if (player.playerStatManager.currentStamina <= 0)
+            if (player.playerInput.moveAmount < 0.5)
             {
-                speed = walkingSpeed;
-                return;
+                speed = 0;
+                player.playerCurrentState.IsSprinting = false;
             }
-            player.playerCurrentState.isSprinting = true;
-            speed = sprintSpeed;
-            player.playerStatManager.currentStamina -= sprintingStaminaCost * Time.deltaTime;
-            player.playerStatManager.ResetStaminaRegenTimer();
+            else if(player.playerStatManager.currentStamina <= 0)
+            {
+                if(player.playerInput.moveAmount < 0.5)
+                {
+                    speed = 0;
+                    
+                }
+                else
+                {
+                    speed = walkingSpeed;
+                }
+                player.playerCurrentState.IsSprinting = false;
+            }
+            else
+            {
+                player.playerCurrentState.IsSprinting = true;
+                speed = sprintSpeed;
+                player.playerStatManager.currentStamina -= sprintingStaminaCost * Time.deltaTime;
+                player.playerStatManager.ResetStaminaRegenTimer();
+                runningTime += Time.deltaTime;
+            }            
         }
         else
         {
-            player.playerCurrentState.isSprinting = false;
+            player.playerCurrentState.IsSprinting = false;
             speed = walkingSpeed;
+            runningTime = 0;
         }
     }
     
@@ -111,7 +130,7 @@ public class PlayerMovement : MonoBehaviour
         horizontalMove.y = moveDirection.y;
         if (!player.playerCurrentState.isLockTarget)
         {
-            if (isRunning)
+            if (isRunning && playerInput.moveAmount > 0.5f)
             {
                 player.playerAnimatorManager.UpdateAnimatorMovement(0, playerInput.moveAmount + 1);
             }
@@ -122,7 +141,7 @@ public class PlayerMovement : MonoBehaviour
         }
         else if(player.playerCurrentState.isLockTarget)
         {
-            if (isRunning)
+            if (isRunning && playerInput.moveAmount > 0.5f)
             {
                 player.playerAnimatorManager.UpdateAnimatorMovement(0, playerInput.moveAmount + 1);
             }

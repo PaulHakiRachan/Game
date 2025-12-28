@@ -12,6 +12,7 @@ public class PlayerInput : MonoBehaviour
     [SerializeField] public float verticalInput;
     [SerializeField] public float horizontalInput;
     [SerializeField] public float moveAmount;
+    public float accelerationHorizontalInput;
 
     [Header("CAMERA INPUT VALUE")]
     [SerializeField] Vector2 cameraInput;
@@ -118,6 +119,8 @@ public class PlayerInput : MonoBehaviour
         verticalInput = movementInput.y;
         horizontalInput = movementInput.x;
 
+        accelerationHorizontalInput = Mathf.Lerp(accelerationHorizontalInput, movementInput.x, Time.deltaTime * 5f);
+
         moveAmount = Mathf.Clamp01(Mathf.Abs(verticalInput) + Mathf.Abs(horizontalInput));
         
 
@@ -147,7 +150,15 @@ public class PlayerInput : MonoBehaviour
 
             Player.instance.SetPlayerActionHand(true);
 
-            Player.instance.playerCombatManager.PerformWeaponBasedAction(Player.instance.playerInventoryManager.currentRightHandWeapon.oh_LC_Action, Player.instance.playerInventoryManager.currentRightHandWeapon);
+            if (Player.instance.playerAnimatorManager.canWeDoAnotherAttack)
+            {
+                Player.instance.playerCombatManager.doAnotherAttack = true;
+            }
+            else
+            {
+                Player.instance.playerCombatManager.PerformWeaponBasedAction(Player.instance.playerInventoryManager.currentRightHandWeapon.oh_LC_Action, Player.instance.playerInventoryManager.currentRightHandWeapon);
+
+            }
         }
     }
 
@@ -257,12 +268,13 @@ public class PlayerInput : MonoBehaviour
         }
     }
 
+    public float switchingWeaponTime = 1f;
     private void HandleSwitchRightWeaponInput()
     {
         if (switchRightWeapon_Input)
         {
             switchRightWeapon_Input = false;
-            Player.instance.playerEquipmentManager.SwitchRightWeapon();    
+            Player.instance.playerEquipmentManager.SwitchRightWeapon();
         }
     }
 

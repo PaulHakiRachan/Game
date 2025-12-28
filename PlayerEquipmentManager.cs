@@ -199,13 +199,13 @@ public class PlayerEquipmentManager : MonoBehaviour
         if (Player.instance.isUsingRightHand)
         {
             rightWeaponManager.meleeWeaponDamageCollider.EnableDamageCollider();
-            character.playerSFXManager.PlaySFX(WorldSFXManager.instance.ChooseRandomSFXFromArray(character.playerInventoryManager.currentRightHandWeapon.whoosh), 0.3f);
+            character.characterSFXManager.PlaySFX(WorldSFXManager.instance.ChooseRandomSFXFromArray(character.playerInventoryManager.currentRightHandWeapon.whoosh), 0.3f);
             //Debug.Log("เปิด Collider ข้างขวา");
         }
         else if (Player.instance.isUsingLeftHand)
         {
             leftWeaponManager.meleeWeaponDamageCollider.EnableDamageCollider();
-            character.playerSFXManager.PlaySFX(WorldSFXManager.instance.ChooseRandomSFXFromArray(character.playerInventoryManager.currentRightHandWeapon.whoosh));
+            character.characterSFXManager.PlaySFX(WorldSFXManager.instance.ChooseRandomSFXFromArray(character.playerInventoryManager.currentRightHandWeapon.whoosh));
         }
     }
 

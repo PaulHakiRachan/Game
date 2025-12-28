@@ -68,7 +68,7 @@ public class WorldUtilityManager : MonoBehaviour
 
         if(cross.y < 0)
         {
-            viewableAngle -= viewableAngle;
+            viewableAngle = -viewableAngle;
         }
 
         return viewableAngle;

@@ -115,9 +115,11 @@ public class PlayerAnimatorManger : MonoBehaviour
     }
 
     private Coroutine closeComboCoroutine;
+    [HideInInspector] public bool canWeDoAnotherAttack = false;
 
     public void EnableCanDoCombo()
     {
+        canWeDoAnotherAttack = true;
         if (Player.instance.isUsingRightHand)
         {
             Player.instance.playerCombatManager.canComboWithMainHandWeapon = true;
@@ -136,7 +138,14 @@ public class PlayerAnimatorManger : MonoBehaviour
 
     private IEnumerator CloseCombo()
     {
-        yield return new WaitForSeconds(1.5f);
+        float timer = 0;
+        float duration = 1.5f;
+        while (timer < duration)
+        {
+            timer += Time.deltaTime;
+            yield return null;
+        }
+       
         DisableCanDoCombo();
         closeComboCoroutine = null;
     }
@@ -144,5 +153,19 @@ public class PlayerAnimatorManger : MonoBehaviour
     public void DisableCanDoCombo()
     {
         Player.instance.playerCombatManager.canComboWithMainHandWeapon = false;
+        canWeDoAnotherAttack = false;
+        //Debug.Log("ยกเลิกคอมโบ");
+    }
+
+
+    public void CheckingCombo()
+    {
+        if (Player.instance.playerCombatManager.doAnotherAttack)
+        {
+            Player.instance.playerCombatManager.canComboWithMainHandWeapon = true;
+            Player.instance.playerCombatManager.PerformWeaponBasedAction(Player.instance.playerInventoryManager.currentRightHandWeapon.oh_LC_Action, Player.instance.playerInventoryManager.currentRightHandWeapon);
+            Debug.Log("รันคอมโบอีกครั้ง");
+        }
+        Player.instance.playerCombatManager.doAnotherAttack = false;
     }
 }

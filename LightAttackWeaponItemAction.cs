@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Player Actions/Weapon Actions/Light Attack Action")]
@@ -48,10 +49,7 @@ public class LightAttackWeaponItemAction : WeaponItemAction
                 player.PlayerTargetAttackActionAnimation(playerPerformingAction,AttackType.LightAttack03, light_Attack_03, true);
             }
 
-            else
-            {
-                player.PlayerTargetAttackActionAnimation(playerPerformingAction,AttackType.LightAttack01, light_Attack_01, true);
-            }
+            
         }
         else if(!playerPerformingAction.playerCurrentState.isPerformingAction && playerPerformingAction.playerCombatManager.readyToPerformAttack)
         {
@@ -60,6 +58,8 @@ public class LightAttackWeaponItemAction : WeaponItemAction
         }
 
     }
+
+    
 
 
 }
